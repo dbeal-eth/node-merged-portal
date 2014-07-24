@@ -4,6 +4,11 @@ This is a simple pool which makes use of node-merged-pool to allow for a simple 
 
 Quick Start
 -----------
+0. Clone this repository
+0. Gather dependencies:
+```
+npm install
+```
 0. Set coin configurations
 0. Copy config.json.example to config.json.
 0. Edit config.json as needed.
