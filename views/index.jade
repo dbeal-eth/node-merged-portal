@@ -1,5 +1,25 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+    h1 Welcome to Merged Open Pool!
+    b How to use this pool:
+    ol
+        li Create an account at addie.cc
+        li Add any addresses required for payout of all coins you will be mining on the pool
+        li Use the connection information below to connect your scrypt miner with your addie.cc username
+        li View stats:
+        ul
+            li /user/(username) - View individual user stats
+            li /block/(coin) - View blocks found by the pool for coins
+            li /block/(coin)/(height) - View block rewards for each client
+            li /payout/(coin) - View transaction IDs of payouts from the pool
+            li /payout/(coin)/(id) - View details about the transaction from a specific payout
+
+    h1 Connection Details
+    each pool in pools
+        hr
+        h3= pool.coin.name
+        each aux in pool.auxes
+            h4= "MERGED WITH: " + aux.name
+        each data,port in pool.ports
+            h5= "PORT: " + port + " DIFFICULTY: " + data.diff + " VARDIFF: " + (data.varDiff ? "YES" : "NO")

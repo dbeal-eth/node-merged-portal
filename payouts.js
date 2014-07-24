@@ -63,6 +63,8 @@ module.exports.run = function() {
                                 return;
                             }
 
+                            if(Object.keys(payouts).length < 1) return; // No payouts to execute at this time
+
                             coin.daemon.cmd('sendmany', ['', payouts], function(result) {
                                 if(result[0].error) {
                                     console.log('Could not send payouts: ' + JSON.stringify(result[0].error));
@@ -70,7 +72,7 @@ module.exports.run = function() {
                                     return;
                                 }
                                 // Put the response in the database
-                                db.pushPayout(result[0].response, payouts);
+                                db.pushPayout(coin.symbol, result[0].response, payouts);
                                 // Payouts were sent in success. Clear all the balances
                                 u.forEach(function(user) {
                                     db.clearBalance(coin.symbol, user);

@@ -6,7 +6,7 @@ var MAIN_CONFIG = 'config.json';
 var COIN_CONFIGS = 'coins/';
 var POOL_CONFIGS = 'pools/';
 
-var allCoins = [];
+allCoins = [];
 
 function processOptions(options) {
     if(fs.existsSync(COIN_CONFIGS + options.coin)) {
@@ -37,7 +37,9 @@ if(cluster.isMaster) {
     var logger = require('morgan');
 
     var routes = require('./routes/index');
-    var users = require('./routes/user');
+    var users = require('./routes/users');
+    var blocks = require('./routes/blocks');
+    var payouts = require('./routes/payouts');
 
     var poolOptions = [];
 
@@ -75,8 +77,14 @@ if(cluster.isMaster) {
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
 
-    app.use('/', routes);
+    //app.use('/', routes);
     app.use('/user', users);
+    app.use('/block', blocks);
+    app.use('/payout', payouts);
+
+    app.get('/', function(req, res) {
+        res.render('index', { pools: poolOptions, title: 'Home' });
+    });
 
     /// catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -111,6 +119,12 @@ if(cluster.isMaster) {
 
 
     module.exports = app;
+
+    app.set('port', config.web.port);
+
+    var server = app.listen(app.get('port'), function() {
+        console.log('Started web server!');
+    });
 }
 else {
     var t = null;

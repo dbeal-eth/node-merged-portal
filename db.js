@@ -1,7 +1,12 @@
-var PPLNS_SHARES = 100000;
+var fs = require('fs');
 
-var SHARELOG_MAX_LENGTH = 20000;
-var GRAPH_MAX_LENGTH = 20000; // Space is not a huge issue ATM... probobly should be keeping more details anyway.
+var MAIN_CONFIG = 'config.json';
+var config = JSON.parse(fs.readFileSync(MAIN_CONFIG, {encoding: 'utf8'}));
+
+var PPLNS_SHARES = config.pplnsShares;
+
+var SHARELOG_MAX_LENGTH = config.db.sharelogMaxLength;
+var GRAPH_MAX_LENGTH = config.db.graphMaxLength;
 
 // Functions to modify the database
 
@@ -116,11 +121,11 @@ module.exports = {
 		data.payouts = {};
 		data.balances = {};
 		async.each(coins, function(coin, callback) {
-			module.exports.getUserPayouts(coin, user, function(payouts) {
-				data.payouts[coin] = payouts;
-				module.exports.getBalance(coin, user, function(err, balance) {
+			module.exports.getUserPayouts(coin.symbol, user, function(payouts) {
+				data.payouts[coin.symbol] = payouts;
+				module.exports.getBalance(coin.symbol, user, function(err, balance) {
 					if(err || !balance) balance = 0;
-					data.balances[coin] = balance;
+					data.balances[coin.symbol] = balance;
 					callback();
 				});
 			});
@@ -233,19 +238,19 @@ module.exports = {
 		db.smembers('balances:' + coin, callback);
 	},
 
-	pushPayout: function(id, payouts) {
-		db.set('payouts:' + id, JSON.stringify(payouts));
-		db.lpush('payouts', id);
+	pushPayout: function(coin, id, payouts) {
+		db.set(coin + ':payouts:' + id, JSON.stringify(payouts));
+		db.lpush(coin + ':payouts', id);
 	},
 
-	listPayouts: function(callback, start, end) {
+	listPayouts: function(coin, callback, start, end) {
 		if(!start) start = 0;
 		if(!end) end = 9;
-		db.lrange('payouts', start, end, callback);
+		db.lrange(coin + ':payouts', start, end, callback);
 	},
 
-	getPayout: function(id, callback) {
-		db.get('payouts:' + id, function(err, res) {
+	getPayout: function(coin, id, callback) {
+		db.get(coin + ':payouts:' + id, function(err, res) {
 			if(err) {
 				callback(err);
 				return;
