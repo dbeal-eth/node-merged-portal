@@ -42,13 +42,17 @@ Array.prototype.avg = function() {
 
 module.exports = {
     pushShare: function(coin, user, value) {
+		db.multi()
         // sharelog
-        db.lpush(coin + ':sharelog', [user, value.toString()].join(':'));
-        db.ltrim(coin + ':sharelog', 0, SHARELOG_MAX_LENGTH);
+        	.lpush(coin + ':sharelog', [user, value.toString()].join(':'))
+        	.ltrim(coin + ':sharelog', 0, SHARELOG_MAX_LENGTH)
         // other stats
-		db.incrbyfloat(coin + ':shares', value);
-        db.incrbyfloat('totalshares', value.toString());
-        db.incrbyfloat('users:' + user + ':totalshares', value.toString());
+			.incrbyfloat(coin + ':shares', value)
+        	.incrbyfloat('totalshares', value.toString())
+        	.incrbyfloat('users:' + user + ':totalshares', value.toString())
+			.incrbyfloat('users:' + user + ':shares', value.toString())
+			.sadd('users', user)
+			.exec();
     },
 
     // value is assuming the fee was already removed
@@ -149,8 +153,11 @@ module.exports = {
 			});
 		}, function(err) {
 			db.get('users:' + user + ':totalshares', function(err, shares) {
-				data.totalshares = shares;
-				callback(data);
+				db.get('users:' + user + ':hashrate', function(err, hashrate) {
+					data.totalshares = shares;
+					data.hashrate = hashrate;
+					callback(data);
+				});
 			});
 		});
 	},
@@ -277,8 +284,12 @@ module.exports = {
 		});
 	},
 
+	getUsers: function(callback) {
+		db.smembers('users', callback);
+	},
+
 	// Call this on a regular basis to get hashrate calculations
-	rotateHashrates: function(namespace) {
+	rotateHashrates: function(namespace, isUser) {
 		db.get(namespace + ':shares', function(err, shares) {
 			db.lpush(namespace + ':shareHist', shares);
 			db.ltrim(namespace + ':shareHist', 0, HASHRATE_TIME);
@@ -289,11 +300,16 @@ module.exports = {
 				else hashrate = data.avg() * Math.pow(2, 16) / 60;
 				db.set(namespace + ':hashrate', hashrate);
 				db.set(namespace + ':shares', 0);
+				// Garbage collection user if mining stops
+				if(isUser && hashrate === 0) db.srem('users', namespace.split(':')[1]);
 			});
 		});
 	},
 
 	getHashrate: function(namespace, callback) {
-		db.get(namespace + ':hashrate', callback);
+		db.get(namespace + ':hashrate', function(err, hashrate) {
+			if(!hashrate) hashrate = 0;
+			callback(err, hashrate);
+		});
 	}
 };

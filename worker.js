@@ -45,7 +45,7 @@ module.exports.run = function() {
     });
 
     pool.on('block', function(coin, height, blockHash, txHash, value, difficulty, user) {
-        console.log('BLOCK found by ' + user + ' on ' + coin);
+        console.log('BLOCK found by ' + user + ' on ' + coin + ', VALUE: ' + value);
         // Pass this directly to the database; it will do the rest
         db.pushBlock(options.coin.symbol, coin, height, blockHash, txHash, value, difficulty, user);
     });

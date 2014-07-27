@@ -142,7 +142,13 @@ if(cluster.isMaster) {
         poolOptions.forEach(function(options) {
             db.rotateHashrates(options.coin.symbol);
         });
-
+        // Now for the users
+        db.getUsers(function(err, users) {
+            if(err || !users) return;
+            users.forEach(function(user) {
+                db.rotateHashrates('users:' + user, true);
+            });
+        });
     }, 60000);
 }
 else {
