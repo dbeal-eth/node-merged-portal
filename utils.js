@@ -49,3 +49,22 @@ exports.round = function(num, places) {
 	var multiplier = Math.pow(10, places);
 	return Math.round(num * multiplier) / multiplier;
 };
+
+exports.hashrateString = function(hr) {
+	var  names = [
+		'',
+		'K',
+		'M',
+		'G',
+		'T'
+	];
+	var ext = 'h/s';
+
+	var n = 0;
+	while(hr > 999) {
+		hr = hr / 1000;
+		n++;
+	}
+
+	return exports.round(hr, 2) + names[n] + ext;
+};

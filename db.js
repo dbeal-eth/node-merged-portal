@@ -7,6 +7,7 @@ var PPLNS_SHARES = config.pplnsShares;
 
 var SHARELOG_MAX_LENGTH = config.db.sharelogMaxLength;
 var GRAPH_MAX_LENGTH = config.db.graphMaxLength;
+var HASHRATE_TIME = config.db.hashrateTime;
 
 // Functions to modify the database
 
@@ -23,14 +24,31 @@ db.on('error', function(err) {
 	console.error(err.stack);
 });
 
+Array.prototype.avg = function() {
+    var sum = 0;
+    var j = 0;
+    for(var i = 0;i < this.length;i++){
+        if(isFinite(this[i])){
+          sum=sum + parseFloat(this[i]);
+           j++;
+        }
+    }
+    if(j === 0){
+        return 0;
+    }else{
+        return sum / j;
+    }
+};
+
 module.exports = {
     pushShare: function(coin, user, value) {
         // sharelog
         db.lpush(coin + ':sharelog', [user, value.toString()].join(':'));
         db.ltrim(coin + ':sharelog', 0, SHARELOG_MAX_LENGTH);
         // other stats
+		db.incrbyfloat(coin + ':shares', value);
         db.incrbyfloat('totalshares', value.toString());
-        db.incrbyfloat('totalshares:' + user, value.toString());
+        db.incrbyfloat('users:' + user + ':totalshares', value.toString());
     },
 
     // value is assuming the fee was already removed
@@ -130,7 +148,7 @@ module.exports = {
 				});
 			});
 		}, function(err) {
-			db.get('totalshares:' + user, function(err, shares) {
+			db.get('users:' + user + ':totalshares', function(err, shares) {
 				data.totalshares = shares;
 				callback(data);
 			});
@@ -215,7 +233,7 @@ module.exports = {
             callback(parseInt(reply));
         };
         if(!user) db.get('totalshares', f);
-        else db.get('totalshares:' + user, f);
+        else db.get('users:' + user + ':totalshares', f);
     },
 
     // User balance functions
@@ -257,5 +275,25 @@ module.exports = {
 			}
 			callback(null, JSON.parse(res));
 		});
+	},
+
+	// Call this on a regular basis to get hashrate calculations
+	rotateHashrates: function(namespace) {
+		db.get(namespace + ':shares', function(err, shares) {
+			db.lpush(namespace + ':shareHist', shares);
+			db.ltrim(namespace + ':shareHist', 0, HASHRATE_TIME);
+			// Calculate the hashrate from the share history
+			db.lrange(namespace + ':shareHist', 0, -1, function(err, data) {
+				var hashrate;
+				if(err || !data) hashrate = 0;
+				else hashrate = data.avg() * Math.pow(2, 16) / 60;
+				db.set(namespace + ':hashrate', hashrate);
+				db.set(namespace + ':shares', 0);
+			});
+		});
+	},
+
+	getHashrate: function(namespace, callback) {
+		db.get(namespace + ':hashrate', callback);
 	}
 };

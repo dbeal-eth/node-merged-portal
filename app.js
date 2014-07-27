@@ -36,6 +36,10 @@ if(cluster.isMaster) {
     var bodyParser = require('body-parser');
     var logger = require('morgan');
 
+    var async = require('async');
+    var db = require('./db');
+    var utils = require('./utils');
+
     var routes = require('./routes/index');
     var users = require('./routes/users');
     var blocks = require('./routes/blocks');
@@ -83,7 +87,14 @@ if(cluster.isMaster) {
     app.use('/payout', payouts);
 
     app.get('/', function(req, res) {
-        res.render('index', { pools: poolOptions, title: 'Home' });
+        var po = poolOptions;
+        async.map(po, function(options, callback) {
+            db.getHashrate(options.coin.symbol, function(err, hr) {
+                callback(err, utils.hashrateString(hr));
+            });
+        }, function(err, hashrates) {
+            res.render('index', { pools: poolOptions, hashrates: hashrates, title: 'Home' });
+        });
     });
 
     /// catch 404 and forward to error handler
@@ -125,6 +136,14 @@ if(cluster.isMaster) {
     var server = app.listen(app.get('port'), function() {
         console.log('Started web server!');
     });
+
+    // Start statistics
+    setInterval(function() {
+        poolOptions.forEach(function(options) {
+            db.rotateHashrates(options.coin.symbol);
+        });
+
+    }, 60000);
 }
 else {
     var t = null;

@@ -31,7 +31,8 @@ config.json
 
     "db": {
         "sharelogMaxLength": 20000, // This should always be much greater than pplnsShares
-        "graphMaxLength": 10000 // Graphs are not yet implemented
+        "graphMaxLength": 10000, // Graphs are not yet implemented
+        "hashrateTime": 10 // Number if minutes over which the pool hashrate will be calculated
     },
 
     "payouts": {
