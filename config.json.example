@@ -1,0 +1,18 @@
+{
+    "web": {
+        "port": 4567
+    },
+
+    "db": {
+        "sharelogMaxLength": 20000,
+        "graphMaxLength": 10000,
+        "hashrateTime": 10
+    },
+
+    "payouts": {
+        "interval": 20,
+        "threshold": 1
+    },
+
+    "pplnsShares": 100000
+}
