@@ -18,8 +18,9 @@ block content
                     td Reward
             tbody
                 each payout in data
-                    td= payout.data
-                    td= payout.reward
+                    tr
+                        td= payout.height
+                        td= payout.reward
     h3 Other Stats:
     h5 Current Hashrate: #{hashrate}
     h5 Total Shares Submitted Ever: #{totalshares}
