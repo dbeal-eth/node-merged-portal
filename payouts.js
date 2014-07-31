@@ -36,33 +36,39 @@ module.exports.run = function() {
                     // Currently, this function doesnt actually pass an error
                     // Check balances. Do they meet the threshold in options?
                     db.getUsersWithBalance(coin.symbol, function(err, users) {
+			console.log('USERS WITH BALANCE: ' + JSON.stringify(users));
                         var u = [];
                         var payouts = {};
                         async.each(users, function(user, callback) {
                             db.getBalance(coin.symbol, user, function(err, balance) {
-                                balance = parseInt(balance);
+                                balance = parseFloat(balance);
                                 if(err) {
                                     callback(err);
                                     return;
                                 }
                                 if(balance >= options.threshold) {
                                     // Query addie.cc to get user payout address
-                                    request('http://addie.cc/api/' + user + '/' + coin.symbol, function(error, response, body) {
+                                    request({url:'http://addie.cc/api/' + user + '/' + coin.symbol, timeout:10000}, function(error, response, body) {
                                         if(!error && response.statusCode == 200) {
+					    console.log('Added payout for ' + user + ' on ' + coin.symbol);
                                             // The body contains the payout address
-                                            payouts[body] = utils.round(balance, 8);
+                                            payouts[body] = utils.round(balance, 8)
                                             u.push(user);
                                         }
+				        else console.log('Did not add payout: ' + user + ' on ' + coin.symbol);
+
                                         callback();
                                     });
                                 }
+				else callback();
                             });
                         }, function(err) {
                             if(err) {
+				console.log('There was an error: ' + JSON.stringify(err));
                                 callback(err);
                                 return;
                             }
-
+			    console.log('Payouts: ' + JSON.stringify(payouts));
                             if(Object.keys(payouts).length < 1) return; // No payouts to execute at this time
 
                             coin.daemon.cmd('sendmany', ['', payouts], function(result) {

@@ -175,7 +175,9 @@ module.exports = {
             daemon.batchCmd(commands, function(err, results) {
                 results.forEach(function(tx, i) {
                     if(tx.error && tx.error.code === -5) {
-                        console.log('Daemon reports invalid txn for payouts!');
+                        console.log('Daemon reports bad txn from mining!');
+			var blk = [blocks[i].height.toString(), blocks[i].hash, blocks[i].txHash, blocks[i].reward.toString(), blocks[i].user].join(':');
+                        db.lrem(coin + ':curblocks', 1, blk);
                         return;
                     }
                     else if(tx.error) {
@@ -190,17 +192,14 @@ module.exports = {
                             for(var user in payouts) {
                                 module.exports.addBalance(coin, user, payouts[user]);
                             }
-							// Remove block from current list
-							// Convert back into format to be deleted
-							var blk = [blocks[i].height.toString(), blocks[i].hash, blocks[i].txHash, blocks[i].reward.toString(), blocks[i].user].join(':');
-							db.lrem(coin + ':curblocks', 1, blk);
+			    // Remove block from current list
+			    // Convert back into format to be deleted
+			    var blk = [blocks[i].height.toString(), blocks[i].hash, blocks[i].txHash, blocks[i].reward.toString(), blocks[i].user].join(':');
+			    db.lrem(coin + ':curblocks', 1, blk);
                         });
                     }
-                    if(i == results.length - 1) {
-                        // Execute the callback
-                        callback();
-                    }
                 });
+		callback();
             });
         });
     },
@@ -248,6 +247,7 @@ module.exports = {
     addBalance: function(coin, user, amount) {
         db.incrbyfloat('balances:' + coin + ':' + user, amount);
 		db.sadd('balances:' + coin, user);
+	console.log('Added ' + amount + ' to user ' + user + ' on ' + coin);
     },
 
     getBalance: function(coin, user, callback) {

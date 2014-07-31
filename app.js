@@ -7,11 +7,12 @@ var COIN_CONFIGS = 'coins/';
 var POOL_CONFIGS = 'pools/';
 
 allCoins = [];
+ac = {};
 
 function processOptions(options) {
     if(fs.existsSync(COIN_CONFIGS + options.coin)) {
         options.coin = JSON.parse(fs.readFileSync(COIN_CONFIGS + options.coin, {encoding: 'utf8'}));
-        if(allCoins.indexOf(options.coin.symbol) === -1) allCoins.push({ symbol: options.coin.symbol, daemons: options.daemons });
+        ac[options.coin.symbol] = { symbol: options.coin.symbol, daemons: options.daemons };
         if(options.auxes) {
             options.auxes.forEach(processOptions);
             options.auxes.forEach(function(aux) {
@@ -62,7 +63,10 @@ if(cluster.isMaster) {
         // Fork thread
         cluster.fork({ type: 'pool', options: JSON.stringify(options) });
     });
-
+    for(symbol in ac) {
+        allCoins.push(ac[symbol]);
+    }
+    console.log(JSON.stringify(allCoins));
     // Spawn coin payment daemon
     cluster.fork({ type: 'payouts', coins: JSON.stringify(allCoins), payouts: JSON.stringify(config.payouts) });
 
