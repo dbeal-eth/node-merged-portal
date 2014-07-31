@@ -1,0 +1,25 @@
+extends layout
+
+block content
+    h1 Stats for #{name}
+
+    h3 Balances:
+    ul
+    each balance, coin in balances
+        li #{coin}: #{balance}
+    h3 Payouts:
+    each data, coin in payouts
+        table
+            caption
+                h4 #{coin} Payouts
+            thead
+                th
+                    td Height
+                    td Reward
+            tbody
+                each payout in data
+                    td= payout.data
+                    td= payout.reward
+    h3 Other Stats:
+    h5 Current Hashrate: #{hashrate}
+    h5 Total Shares Submitted Ever: #{totalshares}
