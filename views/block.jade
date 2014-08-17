@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    h1 #{height} Block Payouts
+    h3 Reward: #{reward}
+    h3 Shares Procesed: #{shares}
+    h3 Payouts:
+    table.table
+        tr
+            th User
+            th Amount
+        each value, address in users
+            tr
+                td
+                    a(href="/user/#{address}")= address
+                td= value

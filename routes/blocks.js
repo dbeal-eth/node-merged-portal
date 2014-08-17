@@ -21,7 +21,10 @@ router.get('/:coin', function(req, res) {
 router.get('/:coin/:height', function(req, res) {
     db.getBlockPayouts(req.params.coin, req.params.height, function(data) {
         if(!data) res.send('Block does not exist, or block not found by this pool');
-        else res.send(JSON.stringify(data, null, 4));
+        else {
+            data.height = req.params.height;
+            res.render('block', data);
+        }
     });
 });
 
