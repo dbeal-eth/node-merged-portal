@@ -1,11 +1,11 @@
 {
-  "name": "merged-portal",
-  "version": "0.0.1",
+  "name": "merged-pooler-portal",
+  "version": "0.0.2",
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "merged-pool": "0.1.10",
+    "merged-pooler": "~0.1.15",
     "express": "~4.2.0",
     "static-favicon": "~1.0.0",
     "morgan": "~1.0.0",
