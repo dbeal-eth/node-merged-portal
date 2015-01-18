@@ -24,7 +24,7 @@
     "async": "~0.9.0",
     "base58-native": "~0.1.0"
   },
-  "description": "Node Merged Portal ================== This is a simple pool which makes use of merged-pooler to allow for a simple merged mining solution",
+  "description": "This is a simple pool which makes use of merged-pooler to allow for a simple merged mining solution",
   "main": "app.js",
   "repository": {
     "type": "git",
