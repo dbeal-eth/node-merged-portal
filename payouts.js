@@ -89,7 +89,7 @@ module.exports.run = function() {
                     });
                 });
             }, function(err) {
-                console.log('Finished payouts');
+                console.log('Finished payouts, no errors');
             });
         }, options.interval * 1000); // Execute payouts as specified by the user in the main configuration file
     });

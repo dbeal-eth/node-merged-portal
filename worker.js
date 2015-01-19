@@ -1,4 +1,4 @@
-var Stratum = require('merged-pool');
+var Stratum = require('merged-pooler');
 
 var request = require('request');
 
