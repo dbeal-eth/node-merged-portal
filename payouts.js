@@ -1,7 +1,7 @@
 var async = require('async');
 var request = require('request');
 
-var daemon = require('merged-pool/lib/daemon');
+var daemon = require('merged-pooler/lib/daemon');
 
 var db = require('./db');
 
