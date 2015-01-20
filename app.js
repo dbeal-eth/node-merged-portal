@@ -97,7 +97,7 @@ if(cluster.isMaster) {
                 callback(err, utils.hashrateString(hr));
             });
         }, function(err, hashrates) {
-            res.render('index', { pools: poolOptions, hashrates: hashrates, title: 'Home' });
+            res.render('index', { pools: poolOptions, hashrates: hashrates, title: 'BeMining' });
         });
     });
 
