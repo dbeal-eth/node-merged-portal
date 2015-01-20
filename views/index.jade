@@ -1,15 +1,12 @@
-
 extends layout
-
 block content
-    img(src="/images/borg.png")
-    h1 Welcome to the BORG pool!
-    h5 We are the Borg. Your biological and technological distinctiveness will be added to our own. Resistance is futile.
-    b How to accept assimilation:
+    h4 Under heavy development! Many things will change. Do not mine here yet, as the payment system is still inoperable. :)
+    h5 I can't stay away.
+    b Quick Config:
     ol
         li Create an account at addie.cc
         li Add any addresses required for payout of all coins you will be mining on the pool
-        li Use the connection information below to connect your scrypt miner with your addie.cc username
+        li Use the connection information below to connect your scrypt miner with your <a href="https://addie.cc" target="_blank">addie.cc</a> username
         li View stats:
         ul
             li /user/(username) - View individual user stats
@@ -23,6 +20,7 @@ block content
         hr
         h3= pool.coin.name
         each aux in pool.auxes
+            h4= "MERGED WITH: " + aux.name
             h4= "MERGED WITH: " + aux.name
         h4="HASHRATE: " + hashrates[i]
         each data,port in pool.ports

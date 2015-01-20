@@ -1,7 +1,7 @@
 var async = require('async');
 var request = require('request');
 
-var daemon = require('merged-pool/lib/daemon');
+var daemon = require('merged-pooler/lib/daemon');
 
 var db = require('./db');
 
@@ -89,7 +89,7 @@ module.exports.run = function() {
                     });
                 });
             }, function(err) {
-                console.log('Finished payouts');
+                console.log('Finished payouts, no errors');
             });
         }, options.interval * 1000); // Execute payouts as specified by the user in the main configuration file
     });

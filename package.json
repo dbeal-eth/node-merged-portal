@@ -1,13 +1,19 @@
 {
-  "name": "merged-portal",
-  "version": "0.0.1",
-  "scripts": {
-    "start": "node ./bin/www"
-  },
+  "name": "merged-pooler-portal",
+  "version": "0.1.0",
+  "keywords": [
+    "merged",
+    "dogecoin",
+    "litecoin",
+    "mining",
+    "nomp",
+    "crytpocurrency",
+    "rekt"
+  ],
   "dependencies": {
-    "merged-pool": "0.1.10",
+    "merged-pooler": "~0.1.15",
     "express": "~4.2.0",
-    "static-favicon": "~1.0.0",
+    "serve-favicon": "*",
     "morgan": "~1.0.0",
     "cookie-parser": "~1.0.1",
     "body-parser": "~1.0.0",
@@ -17,5 +23,20 @@
     "request": "~2.37.0",
     "async": "~0.9.0",
     "base58-native": "~0.1.0"
-  }
+  },
+  "description": "This is a simple pool which makes use of merged-pooler to allow for a simple merged mining solution",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sigwo/node-merged-portal"
+  },
+  "author": "Steven G. <steven@bemining.net> (http://bemining.net/)",
+  "license": "GPL-2.0",
+  "contributors": [
+    "KillerByte"
+  ],
+  "bugs": {
+    "url": "https://github.com/sigwo/node-merged-portal/issues"
+  },
+  "homepage": "https://github.com/sigwo/node-merged-portal"
 }
